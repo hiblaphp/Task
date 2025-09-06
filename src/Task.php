@@ -2,9 +2,9 @@
 
 namespace Fasync\Task;
 
-use Rcalicdan\FiberAsync\Async\AsyncOperations;
-use Rcalicdan\FiberAsync\Loop\LoopOperations;
-use Rcalicdan\FiberAsync\Promise\Interfaces\PromiseInterface;
+use Fasync\Async\AsyncOperations;
+use Fasync\Loop\LoopOperations;
+use Fasync\Promise\Interfaces\PromiseInterface;
 
 /**
  * Static API for event loop management and high-level async execution.
