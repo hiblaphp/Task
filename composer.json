@@ -8,8 +8,7 @@
             "Fasync\\Task\\": "src/"
         },
         "files": [
-            "src/Helpers/global_functions.php",
-            "src/Helpers/namespace_functions.php"
+            "src/Helpers/global_functions.php"
         ]
     },
     "autoload-dev": {
