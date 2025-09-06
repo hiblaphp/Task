@@ -1,0 +1,28 @@
+{
+    "name": "fasync/task",
+    "description": "High level abstraction leyer for running asynchronous task wihout managin the eventloop",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Fasync\\Task\\": "src/"
+        },
+        "files": [
+            "src/Helpers/global_functions.php",
+            "src/Helpers/namespace_functions.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Reymart A. Calicdan"
+        }
+    ],
+    "require-dev": {
+        "pestphp/pest": "^4.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
