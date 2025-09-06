@@ -1,6 +1,6 @@
 <?php
 
-namespace Fasync\Loop\Handlers;
+namespace Fasync\Task\Handlers;
 
 use Exception;
 use Fasync\Async\AsyncOperations;

@@ -3,7 +3,7 @@
 namespace Fasync\Task;
 
 use Fasync\Async\AsyncOperations;
-use Fasync\Loop\LoopOperations;
+use Fasync\Task\LoopOperations;
 use Fasync\Promise\Interfaces\PromiseInterface;
 
 /**

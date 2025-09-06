@@ -1,6 +1,6 @@
 <?php
 
-namespace Fasync\Loop\Interfaces;
+namespace Fasync\Task\Interfaces;
 
 use Exception;
 use Fasync\Promise\Interfaces\PromiseInterface;

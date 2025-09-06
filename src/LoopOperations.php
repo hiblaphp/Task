@@ -1,13 +1,13 @@
 <?php
 
-namespace Fasync\Loop;
+namespace Fasync\Task;
 
 use Exception;
 use Fasync\Async\AsyncOperations;
-use Fasync\Loop\Handlers\ConcurrentExecutionHandler;
-use Fasync\Loop\Handlers\LoopExecutionHandler;
-use Fasync\Loop\Handlers\TimeoutHandler;
-use Fasync\Loop\Interfaces\LoopOperationsInterface;
+use Fasync\Task\Handlers\ConcurrentExecutionHandler;
+use Fasync\Task\Handlers\LoopExecutionHandler;
+use Fasync\Task\Handlers\TimeoutHandler;
+use Fasync\Task\Interfaces\LoopOperationsInterface;
 use Fasync\Promise\Interfaces\PromiseInterface;
 
 /**

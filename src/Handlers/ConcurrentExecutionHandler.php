@@ -1,6 +1,6 @@
 <?php
 
-namespace Fasync\Loop\Handlers;
+namespace Fasync\Task\Handlers;
 
 use Fasync\Async\AsyncOperations;
 use Fasync\Promise\Interfaces\PromiseInterface;
