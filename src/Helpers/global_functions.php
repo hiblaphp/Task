@@ -1,7 +1,7 @@
 <?php
 
-use Fasync\Task\Task;
-use Fasync\Promise\Interfaces\PromiseInterface;
+use Hibla\Task\Task;
+use Hibla\Promise\Interfaces\PromiseInterface;
 
 if (! function_exists('run')) {
     /**

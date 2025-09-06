@@ -1,9 +1,9 @@
 <?php
 
-namespace Fasync\Task\Handlers;
+namespace Hibla\Task\Handlers;
 
-use Fasync\Async\AsyncOperations;
-use Fasync\Promise\Interfaces\PromiseInterface;
+use Hibla\Async\AsyncOperations;
+use Hibla\Promise\Interfaces\PromiseInterface;
 
 /**
  * Handles concurrent execution of multiple async operations.

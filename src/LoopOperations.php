@@ -1,14 +1,14 @@
 <?php
 
-namespace Fasync\Task;
+namespace Hibla\Task;
 
 use Exception;
-use Fasync\Async\AsyncOperations;
-use Fasync\Task\Handlers\ConcurrentExecutionHandler;
-use Fasync\Task\Handlers\LoopExecutionHandler;
-use Fasync\Task\Handlers\TimeoutHandler;
-use Fasync\Task\Interfaces\LoopOperationsInterface;
-use Fasync\Promise\Interfaces\PromiseInterface;
+use Hibla\Async\AsyncOperations;
+use Hibla\Task\Handlers\ConcurrentExecutionHandler;
+use Hibla\Task\Handlers\LoopExecutionHandler;
+use Hibla\Task\Handlers\TimeoutHandler;
+use Hibla\Task\Interfaces\LoopOperationsInterface;
+use Hibla\Promise\Interfaces\PromiseInterface;
 
 /**
  * High-level operations that manage the event loop lifecycle automatically.

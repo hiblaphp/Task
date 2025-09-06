@@ -1,10 +1,10 @@
 <?php
 
-namespace Fasync\Task;
+namespace Hibla\Task;
 
-use Fasync\Async\AsyncOperations;
-use Fasync\Task\LoopOperations;
-use Fasync\Promise\Interfaces\PromiseInterface;
+use Hibla\Async\AsyncOperations;
+use Hibla\Task\LoopOperations;
+use Hibla\Promise\Interfaces\PromiseInterface;
 
 /**
  * Static API for event loop management and high-level async execution.

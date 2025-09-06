@@ -1,11 +1,11 @@
 <?php
 
-namespace Fasync\Task\Handlers;
+namespace Hibla\Task\Handlers;
 
 use Exception;
-use Fasync\Async\AsyncOperations;
-use Fasync\EventLoop\EventLoop;
-use Fasync\Promise\Interfaces\PromiseInterface;
+use Hibla\Async\AsyncOperations;
+use Hibla\EventLoop\EventLoop;
+use Hibla\Promise\Interfaces\PromiseInterface;
 use RuntimeException;
 use Throwable;
 

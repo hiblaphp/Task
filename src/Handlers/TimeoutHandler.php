@@ -1,10 +1,10 @@
 <?php
 
-namespace Fasync\Task\Handlers;
+namespace Hibla\Task\Handlers;
 
 use Exception;
-use Fasync\Async\AsyncOperations;
-use Fasync\Promise\Interfaces\PromiseInterface;
+use Hibla\Async\AsyncOperations;
+use Hibla\Promise\Interfaces\PromiseInterface;
 
 /**
  * Handles timeout functionality for async operations.

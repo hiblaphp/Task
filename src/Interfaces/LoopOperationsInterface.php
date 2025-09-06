@@ -1,9 +1,9 @@
 <?php
 
-namespace Fasync\Task\Interfaces;
+namespace Hibla\Task\Interfaces;
 
 use Exception;
-use Fasync\Promise\Interfaces\PromiseInterface;
+use Hibla\Promise\Interfaces\PromiseInterface;
 
 /**
  * High-level operations for running async tasks with the event loop.
