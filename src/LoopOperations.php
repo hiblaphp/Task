@@ -2,8 +2,8 @@
 
 namespace Hibla\Task;
 
-use Hibla\Async\Exceptions\TimeoutException;
 use Hibla\Async\AsyncOperations;
+use Hibla\Async\Exceptions\TimeoutException;
 use Hibla\Promise\Interfaces\PromiseInterface;
 use Hibla\Task\Handlers\ConcurrentExecutionHandler;
 use Hibla\Task\Handlers\LoopExecutionHandler;
@@ -106,10 +106,10 @@ class LoopOperations implements LoopOperationsInterface
      * If the operation doesn't complete within the specified timeout,
      * it will be cancelled and a timeout exception will be thrown.
      *
-       * @param  PromiseInterface<mixed>  $promise  Promise to timeout
+     * @param  PromiseInterface<mixed>  $promise  Promise to timeout
      * @param  float  $seconds  Timeout in seconds
      * @return mixed The result of the async operation
-     * 
+     *
      * @throws TimeoutException If the operation times out
      */
     public function runWithTimeout(PromiseInterface $promise, float $seconds): mixed
@@ -128,5 +128,48 @@ class LoopOperations implements LoopOperationsInterface
     public function runBatch(array $asyncOperations, int $batch, ?int $concurrency = null): array
     {
         return $this->concurrentHandler->runBatch($asyncOperations, $batch, $concurrency);
+    }
+
+    /**
+     * Run multiple async operations concurrently and wait for all to settle.
+     *
+     * All operations are started simultaneously and the method waits for
+     * all to complete (either resolve or reject) before returning their
+     * settlement results in the same order.
+     *
+     * @param  array<int|string, callable|PromiseInterface<mixed>>  $asyncOperations  Array of callables or promises to execute
+     * @return array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> Settlement results of all operations
+     */
+    public function runAllSettled(array $asyncOperations): array
+    {
+        return $this->concurrentHandler->runAllSettled($asyncOperations);
+    }
+
+    /**
+     * Run async operations with concurrency control and wait for all to settle.
+     *
+     * Executes operations with a concurrency limit and waits for all to complete
+     * (either resolve or reject) before returning their settlement results.
+     *
+     * @param  array<int|string, callable|PromiseInterface<mixed>>  $asyncOperations  Array of operations to execute
+     * @param  int  $concurrency  Maximum number of concurrent operations
+     * @return array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> Settlement results of all operations
+     */
+    public function runConcurrentSettled(array $asyncOperations, int $concurrency = 10): array
+    {
+        return $this->concurrentHandler->runConcurrentSettled($asyncOperations, $concurrency);
+    }
+
+    /**
+     * Run async operations in batches with concurrency control and wait for all to settle.
+     *
+     * @param  array<int|string, callable|PromiseInterface<mixed>>  $asyncOperations  Array of operations to execute
+     * @param  int  $batch  Number of operations to run in each batch
+     * @param  int|null  $concurrency  Maximum number of concurrent operations per batch
+     * @return array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> Settlement results of all operations
+     */
+    public function runBatchSettled(array $asyncOperations, int $batch, ?int $concurrency = null): array
+    {
+        return $this->concurrentHandler->runBatchSettled($asyncOperations, $batch, $concurrency);
     }
 }

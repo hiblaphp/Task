@@ -3,8 +3,8 @@
 namespace Hibla\Task;
 
 use Hibla\Async\AsyncOperations;
-use Hibla\Promise\Interfaces\PromiseInterface;
 use Hibla\Async\Exceptions\TimeoutException;
+use Hibla\Promise\Interfaces\PromiseInterface;
 
 /**
  * Static API for event loop management and high-level async execution.
@@ -134,5 +134,53 @@ final class Task
     public static function runBatch(array $asyncOperations, int $batch, ?int $concurrency = null): array
     {
         return self::getLoopOperations()->runBatch($asyncOperations, $batch, $concurrency);
+    }
+
+    /**
+     * Run multiple async operations concurrently and wait for all to settle (resolve or reject).
+     *
+     * Unlike runAll(), this method waits for every operation to complete and returns
+     * all results, including both successful values and rejection reasons.
+     * This method never throws - it always returns settlement results.
+     *
+     * @param  array<int|string, callable(): mixed|PromiseInterface<mixed>>  $asyncOperations  Array of callables or promises to execute.
+     * @return array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> Settlement results of all operations.
+     */
+    public static function runAllSettled(array $asyncOperations): array
+    {
+        return self::getLoopOperations()->runAllSettled($asyncOperations);
+    }
+
+    /**
+     * Run async operations with concurrency control and wait for all to settle.
+     *
+     * Similar to runConcurrent(), but waits for all operations to complete (either resolve or reject)
+     * and returns settlement results for all operations. This method never throws - it always
+     * returns settlement results.
+     *
+     * @param  array<int|string, callable(): mixed|PromiseInterface<mixed>>  $asyncOperations  Array of operations to execute.
+     * @param  int  $concurrency  Maximum number of concurrent operations.
+     * @return array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> Settlement results of all operations.
+     */
+    public static function runConcurrentSettled(array $asyncOperations, int $concurrency = 10): array
+    {
+        return self::getLoopOperations()->runConcurrentSettled($asyncOperations, $concurrency);
+    }
+
+    /**
+     * Run async operations in batches with concurrency control and wait for all to settle.
+     *
+     * Similar to runBatch(), but waits for all operations to complete (either resolve or reject)
+     * and returns settlement results for all operations. This method never throws - it always
+     * returns settlement results.
+     *
+     * @param  array<int|string, callable(): mixed|PromiseInterface<mixed>>  $asyncOperations  Array of operations to execute.
+     * @param  int  $batch  Number of operations to run in each batch.
+     * @param  int|null  $concurrency  Maximum number of concurrent operations per batch.
+     * @return array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> Settlement results of all operations.
+     */
+    public static function runBatchSettled(array $asyncOperations, int $batch, ?int $concurrency = null): array
+    {
+        return self::getLoopOperations()->runBatchSettled($asyncOperations, $batch, $concurrency);
     }
 }

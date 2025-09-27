@@ -46,7 +46,7 @@ final readonly class TimeoutHandler
      * @param  PromiseInterface<mixed>  $promise  Promise to timeout
      * @param  float  $seconds  Timeout in seconds
      * @return mixed The result of the async operation
-     * 
+     *
      * @throws TimeoutException If the operation times out
      */
     public function runWithTimeout(PromiseInterface $promise, float $seconds): mixed

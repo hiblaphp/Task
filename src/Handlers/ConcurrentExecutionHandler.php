@@ -92,4 +92,65 @@ final readonly class ConcurrentExecutionHandler
             return $this->asyncOps->await($this->asyncOps->batch($asyncOperations, $batch, $concurrency));
         });
     }
+
+    /**
+     * Run all async operations concurrently and wait for all to settle.
+     *
+     * Similar to runAll(), but waits for all operations to complete (either resolve or reject)
+     * and returns settlement results for all operations.
+     *
+     * @param  array<int|string, callable|PromiseInterface<mixed>>  $asyncOperations  Array of async operations to execute
+     * @return array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> Settlement results from all operations
+     */
+    public function runAllSettled(array $asyncOperations): array
+    {
+        /** @var array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> */
+        return $this->executionHandler->run(function () use ($asyncOperations) {
+            /** @var array<int|string, PromiseInterface<mixed>> */
+            $promises = [];
+
+            foreach ($asyncOperations as $key => $operation) {
+                $promises[$key] = $this->executionHandler->createPromiseFromOperation($operation);
+            }
+
+            return $this->asyncOps->await($this->asyncOps->allSettled($promises));
+        });
+    }
+
+    /**
+     * Run async operations with controlled concurrency and wait for all to settle.
+     *
+     * Similar to runConcurrent(), but waits for all operations to complete (either resolve or reject)
+     * and returns settlement results for all operations.
+     *
+     * @param  array<int|string, callable|PromiseInterface<mixed>>  $asyncOperations  Array of async operations to execute
+     * @param  int  $concurrency  Maximum number of concurrent operations (default: 10)
+     * @return array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> Settlement results from all operations
+     */
+    public function runConcurrentSettled(array $asyncOperations, int $concurrency = 10): array
+    {
+        /** @var array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> */
+        return $this->executionHandler->run(function () use ($asyncOperations, $concurrency) {
+            return $this->asyncOps->await($this->asyncOps->concurrentSettled($asyncOperations, $concurrency));
+        });
+    }
+
+    /**
+     * Run async operations in batches and wait for all to settle.
+     *
+     * Similar to runBatch(), but waits for all operations to complete (either resolve or reject)
+     * and returns settlement results for all operations.
+     *
+     * @param  array<int|string, callable|PromiseInterface<mixed>>  $asyncOperations  Array of async operations to execute
+     * @param  int  $batch  Batch size
+     * @param  int|null  $concurrency  Maximum concurrency within each batch
+     * @return array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> Settlement results from all operations
+     */
+    public function runBatchSettled(array $asyncOperations, int $batch, ?int $concurrency = null): array
+    {
+        /** @var array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> */
+        return $this->executionHandler->run(function () use ($asyncOperations, $batch, $concurrency) {
+            return $this->asyncOps->await($this->asyncOps->batchSettled($asyncOperations, $batch, $concurrency));
+        });
+    }
 }

@@ -82,7 +82,7 @@ if (! function_exists('run_with_timeout')) {
      * complete within the timeout, it's cancelled and a timeout exception is thrown.
      * The event loop is managed automatically throughout.
      *
-      * @param  PromiseInterface<mixed>  $promise  Promise to timeout
+     * @param  PromiseInterface<mixed>  $promise  Promise to timeout
      * @param  float  $seconds  Maximum time to wait in seconds.
      * @return mixed The result of the operation if completed within timeout.
      *
@@ -106,5 +106,59 @@ if (! function_exists('run_batch')) {
     function run_batch(array $asyncOperations, int $batch, ?int $concurrency = null): array
     {
         return Task::runBatch($asyncOperations, $batch, $concurrency);
+    }
+}
+
+if (! function_exists('run_all_settled')) {
+    /**
+     * Run multiple async operations concurrently and wait for all to settle.
+     *
+     * Unlike run_all(), this method waits for every operation to complete and returns
+     * all results, including both successful values and rejection reasons.
+     * This function never throws - it always returns settlement results.
+     *
+     * @param  array<int|string, callable(): mixed|PromiseInterface<mixed>>  $asyncOperations  Array of callables or promises to execute.
+     * @return array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> Settlement results of all operations.
+     */
+    function run_all_settled(array $asyncOperations): array
+    {
+        return Task::runAllSettled($asyncOperations);
+    }
+}
+
+if (! function_exists('run_concurrent_settled')) {
+    /**
+     * Run async operations with concurrency control and wait for all to settle.
+     *
+     * Similar to run_concurrent(), but waits for all operations to complete and returns
+     * settlement results for all operations. This function never throws - it always
+     * returns settlement results.
+     *
+     * @param  array<int|string, callable(): mixed|PromiseInterface<mixed>>  $asyncOperations  Array of operations to execute.
+     * @param  int  $concurrency  Maximum number of concurrent operations.
+     * @return array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> Settlement results of all operations.
+     */
+    function run_concurrent_settled(array $asyncOperations, int $concurrency = 10): array
+    {
+        return Task::runConcurrentSettled($asyncOperations, $concurrency);
+    }
+}
+
+if (! function_exists('run_batch_settled')) {
+    /**
+     * Run async operations in batches with concurrency control and wait for all to settle.
+     *
+     * Similar to run_batch(), but waits for all operations to complete and returns
+     * settlement results for all operations. This function never throws - it always
+     * returns settlement results.
+     *
+     * @param  array<int|string, callable(): mixed|PromiseInterface<mixed>>  $asyncOperations  Array of operations to execute.
+     * @param  int  $batch  Number of operations to run in each batch.
+     * @param  int|null  $concurrency  Maximum number of concurrent operations per batch.
+     * @return array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}> Settlement results of all operations.
+     */
+    function run_batch_settled(array $asyncOperations, int $batch, ?int $concurrency = null): array
+    {
+        return Task::runBatchSettled($asyncOperations, $batch, $concurrency);
     }
 }
