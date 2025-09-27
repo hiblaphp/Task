@@ -7,11 +7,14 @@
 */
 
 use Hibla\Async\Async;
+use Hibla\Async\Timer;
 use Hibla\EventLoop\EventLoop;
 use Hibla\Promise\Promise;
+use Hibla\Task\Task;
 
 pest()->extend(Tests\TestCase::class)->in('Feature');
 pest()->extend(Tests\TestCase::class)->in('Unit');
+pest()->extend(Tests\TestCase::class)->in('Integration');
 
 /*
 |--------------------------------------------------------------------------
@@ -36,4 +39,6 @@ function resetEventLoop()
     EventLoop::reset();
     Async::reset();
     Promise::reset();
+    Timer::reset();
+    Task::reset();
 }
