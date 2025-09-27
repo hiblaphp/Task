@@ -2,7 +2,7 @@
 
 namespace Hibla\Task;
 
-use Exception;
+use Hibla\Async\Exceptions\TimeoutException;
 use Hibla\Async\AsyncOperations;
 use Hibla\Promise\Interfaces\PromiseInterface;
 use Hibla\Task\Handlers\ConcurrentExecutionHandler;
@@ -106,15 +106,15 @@ class LoopOperations implements LoopOperationsInterface
      * If the operation doesn't complete within the specified timeout,
      * it will be cancelled and a timeout exception will be thrown.
      *
-     * @param  callable|PromiseInterface<mixed>|array<int|string, callable|PromiseInterface<mixed>>  $asyncOperation  The operation to execute
-     * @param  float  $timeout  Maximum time to wait in seconds
-     * @return mixed The result of the operation if completed within timeout
-     *
-     * @throws Exception If the operation times out
+       * @param  PromiseInterface<mixed>  $promise  Promise to timeout
+     * @param  float  $seconds  Timeout in seconds
+     * @return mixed The result of the async operation
+     * 
+     * @throws TimeoutException If the operation times out
      */
-    public function runWithTimeout(callable|PromiseInterface|array $asyncOperation, float $timeout): mixed
+    public function runWithTimeout(PromiseInterface $promise, float $seconds): mixed
     {
-        return $this->timeoutHandler->runWithTimeout($asyncOperation, $timeout);
+        return $this->timeoutHandler->runWithTimeout($promise, $seconds);
     }
 
     /**

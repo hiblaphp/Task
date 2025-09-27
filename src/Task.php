@@ -4,6 +4,7 @@ namespace Hibla\Task;
 
 use Hibla\Async\AsyncOperations;
 use Hibla\Promise\Interfaces\PromiseInterface;
+use Hibla\Async\Exceptions\TimeoutException;
 
 /**
  * Static API for event loop management and high-level async execution.
@@ -66,6 +67,7 @@ final class Task
      * Run an async operation with automatic event loop management.
      *
      * @param  callable(): mixed|PromiseInterface<mixed>  $asyncOperation  The operation to execute.
+     * @param  bool  $resetEventLoop  Whether to reset the event loop after operation completion.
      * @return mixed The result of the async operation.
      */
     public static function run(callable|PromiseInterface $asyncOperation, bool $resetEventLoop = true): mixed
@@ -73,9 +75,15 @@ final class Task
         return self::getLoopOperations()->run($asyncOperation, $resetEventLoop);
     }
 
-    public static function runStateful(callable|PromiseInterface $asyncOperation, bool $resetEventLoop = false): mixed
+    /**
+     * Run an async operation with automatic event loop management.
+     *
+     * @param  callable(): mixed|PromiseInterface<mixed>  $asyncOperation  The operation to execute.
+     * @return mixed The result of the async operation.
+     */
+    public static function runStateful(callable|PromiseInterface $asyncOperation): mixed
     {
-        return self::getLoopOperations()->run($asyncOperation, $resetEventLoop);
+        return self::getLoopOperations()->run($asyncOperation, false);
     }
 
     /**
@@ -104,15 +112,15 @@ final class Task
     /**
      * Run an async operation with a timeout constraint and automatic loop management.
      *
-     * @param  callable(): mixed|PromiseInterface<mixed>|array<int|string, callable(): mixed|PromiseInterface<mixed>>  $asyncOperation  The operation to execute.
-     * @param  float  $timeout  Maximum time to wait in seconds.
+     * @param  PromiseInterface<mixed>  $promise  Promise to timeout
+     * @param  float  $seconds  Maximum time to wait in seconds.
      * @return mixed The result of the operation if completed within timeout.
      *
-     * @throws \Exception If the operation times out.
+     * @throws TimeoutException If the operation times out.
      */
-    public static function runWithTimeout(callable|PromiseInterface|array $asyncOperation, float $timeout): mixed
+    public static function runWithTimeout(PromiseInterface $promise, float $seconds): mixed
     {
-        return self::getLoopOperations()->runWithTimeout($asyncOperation, $timeout);
+        return self::getLoopOperations()->runWithTimeout($promise, $seconds);
     }
 
     /**

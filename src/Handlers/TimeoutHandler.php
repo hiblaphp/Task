@@ -2,8 +2,8 @@
 
 namespace Hibla\Task\Handlers;
 
-use Exception;
 use Hibla\Async\AsyncOperations;
+use Hibla\Async\Exceptions\TimeoutException;
 use Hibla\Promise\Interfaces\PromiseInterface;
 
 /**
@@ -43,16 +43,16 @@ final readonly class TimeoutHandler
      * completes before the timeout, its result is returned. If the timeout
      * is reached first, an exception is thrown.
      *
-     * @param  callable|PromiseInterface<mixed>|array<int|string, callable|PromiseInterface<mixed>>  $asyncOperation  The operation to execute
-     * @param  float  $timeout  Timeout in seconds
+     * @param  PromiseInterface<mixed>  $promise  Promise to timeout
+     * @param  float  $seconds  Timeout in seconds
      * @return mixed The result of the async operation
-     *
-     * @throws Exception If the operation times out
+     * 
+     * @throws TimeoutException If the operation times out
      */
-    public function runWithTimeout(callable|PromiseInterface|array $asyncOperation, float $timeout): mixed
+    public function runWithTimeout(PromiseInterface $promise, float $seconds): mixed
     {
-        return $this->executionHandler->run(function () use ($asyncOperation, $timeout) {
-            return $this->asyncOps->await($this->asyncOps->timeout($asyncOperation, $timeout));
+        return $this->executionHandler->run(function () use ($promise, $seconds) {
+            return $this->asyncOps->await($this->asyncOps->timeout($promise, $seconds));
         });
     }
 }

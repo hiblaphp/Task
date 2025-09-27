@@ -2,7 +2,7 @@
 
 namespace Hibla\Task\Interfaces;
 
-use Exception;
+use Hibla\Async\Exceptions\TimeoutException;
 use Hibla\Promise\Interfaces\PromiseInterface;
 
 /**
@@ -20,7 +20,7 @@ interface LoopOperationsInterface
      * @param  callable|PromiseInterface<mixed>  $asyncOperation  The async operation to run
      * @return mixed The result of the async operation
      *
-     * @throws Exception Any exception thrown by the async operation
+     * @throws \Exception Any exception thrown by the async operation
      */
     public function run(callable|PromiseInterface $asyncOperation): mixed;
 
@@ -47,11 +47,11 @@ interface LoopOperationsInterface
      * If the operation doesn't complete within the timeout period,
      * a timeout exception will be thrown.
      *
-     * @param  callable|PromiseInterface<mixed>  $asyncOperation  The operation to run
-     * @param  float  $timeout  Timeout in seconds
+     * @param  PromiseInterface<mixed>  $promise  Promise to timeout
+     * @param  float  $seconds  Timeout in seconds
      * @return mixed The result of the operation
      *
-     * @throws Exception If the operation times out
+     * @throws TimeoutException If the operation times out
      */
-    public function runWithTimeout(callable|PromiseInterface $asyncOperation, float $timeout): mixed;
+    public function runWithTimeout(PromiseInterface $promise, float $seconds): mixed;
 }
