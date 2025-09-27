@@ -1,5 +1,6 @@
 <?php
 
+use Hibla\Async\Exceptions\TimeoutException;
 use Hibla\Promise\Interfaces\PromiseInterface;
 use Hibla\Task\Task;
 
@@ -32,9 +33,9 @@ if (! function_exists('run_stateful')) {
      * @param  callable(): mixed|PromiseInterface<mixed>  $asyncOperation  The operation to execute.
      * @return mixed The result of the async operation.
      */
-    function run_stateful(callable|PromiseInterface $asyncOperation, bool $resetEventLoop = false): mixed
+    function run_stateful(callable|PromiseInterface $asyncOperation): mixed
     {
-        return Task::runStateful($asyncOperation, $resetEventLoop);
+        return Task::runStateful($asyncOperation);
     }
 }
 
@@ -81,15 +82,15 @@ if (! function_exists('run_with_timeout')) {
      * complete within the timeout, it's cancelled and a timeout exception is thrown.
      * The event loop is managed automatically throughout.
      *
-     * @param  callable(): mixed|PromiseInterface<mixed>|array<int|string, callable(): mixed|PromiseInterface<mixed>>  $asyncOperation  The operation to execute.
-     * @param  float  $timeout  Maximum time to wait in seconds.
+      * @param  PromiseInterface<mixed>  $promise  Promise to timeout
+     * @param  float  $seconds  Maximum time to wait in seconds.
      * @return mixed The result of the operation if completed within timeout.
      *
-     * @throws Exception If the operation times out.
+     * @throws TimeoutException If the operation times out.
      */
-    function run_with_timeout(callable|PromiseInterface|array $asyncOperation, float $timeout): mixed
+    function run_with_timeout(PromiseInterface $promise, float $seconds): mixed
     {
-        return Task::runWithTimeout($asyncOperation, $timeout);
+        return Task::runWithTimeout($promise, $seconds);
     }
 }
 
