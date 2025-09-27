@@ -4,11 +4,11 @@ namespace Hibla\Task;
 
 use Exception;
 use Hibla\Async\AsyncOperations;
+use Hibla\Promise\Interfaces\PromiseInterface;
 use Hibla\Task\Handlers\ConcurrentExecutionHandler;
 use Hibla\Task\Handlers\LoopExecutionHandler;
 use Hibla\Task\Handlers\TimeoutHandler;
 use Hibla\Task\Interfaces\LoopOperationsInterface;
-use Hibla\Promise\Interfaces\PromiseInterface;
 
 /**
  * High-level operations that manage the event loop lifecycle automatically.
@@ -50,7 +50,7 @@ class LoopOperations implements LoopOperationsInterface
      */
     public function __construct(?AsyncOperations $asyncOps = null)
     {
-        $this->asyncOps = $asyncOps ?? new AsyncOperations;
+        $this->asyncOps = $asyncOps ?? new AsyncOperations();
         $this->executionHandler = new LoopExecutionHandler($this->asyncOps);
         $this->concurrentHandler = new ConcurrentExecutionHandler($this->asyncOps, $this->executionHandler);
         $this->timeoutHandler = new TimeoutHandler($this->asyncOps, $this->executionHandler);

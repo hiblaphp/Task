@@ -1,7 +1,7 @@
 <?php
 
-use Hibla\Task\Task;
 use Hibla\Promise\Interfaces\PromiseInterface;
+use Hibla\Task\Task;
 
 if (! function_exists('run')) {
     /**
@@ -22,7 +22,7 @@ if (! function_exists('run')) {
 
 if (! function_exists('run_stateful')) {
     /**
-     * Run an async operation with automatic event loop management without resetting event loop 
+     * Run an async operation with automatic event loop management without resetting event loop
      * for persistent and stateful connections.
      *
      * This function handles the complete lifecycle: starts the event loop,
@@ -85,7 +85,7 @@ if (! function_exists('run_with_timeout')) {
      * @param  float  $timeout  Maximum time to wait in seconds.
      * @return mixed The result of the operation if completed within timeout.
      *
-     * @throws \Exception If the operation times out.
+     * @throws Exception If the operation times out.
      */
     function run_with_timeout(callable|PromiseInterface|array $asyncOperation, float $timeout): mixed
     {
