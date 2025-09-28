@@ -15,9 +15,9 @@ beforeEach(function () {
 describe('ConcurrentExecutionHandler', function () {
     it('executes all operations concurrently and preserves keys', function () {
         $operations = [
-            'op1' =>  Timer::delay(0.01)->then(fn() => 'result1'),
-            'op2' =>  Timer::delay(0.02)->then(fn() => 'result2'),
-            42 =>  Timer::delay(0.005)->then(fn() => 'result42')
+            'op1' => Timer::delay(0.01)->then(fn () => 'result1'),
+            'op2' => Timer::delay(0.02)->then(fn () => 'result2'),
+            42 => Timer::delay(0.005)->then(fn () => 'result42'),
         ];
 
         $results = $this->handler->runAll($operations);
@@ -43,6 +43,7 @@ describe('ConcurrentExecutionHandler', function () {
 
                 $currentConcurrent--;
                 $counter++;
+
                 return "result_$i";
             };
         }
@@ -64,6 +65,7 @@ describe('ConcurrentExecutionHandler', function () {
             $operations["task_$i"] = function () use (&$batchOrder, $batchNum, $i) {
                 await(Timer::delay(0.01));
                 $batchOrder[] = $batchNum;
+
                 return "result_$i";
             };
         }
@@ -83,16 +85,19 @@ describe('ConcurrentExecutionHandler', function () {
         $operations = [
             'success' => function () {
                 await(Timer::delay(0.01));
+
                 return 'success_value';
             },
             'failure' => function () {
                 await(Timer::delay(0.01));
+
                 throw new Exception('deliberate_failure');
             },
             99 => function () {
                 await(Timer::delay(0.01));
+
                 return 'numeric_success';
-            }
+            },
         ];
 
         $results = $this->handler->runAllSettled($operations);
@@ -123,11 +128,13 @@ describe('ConcurrentExecutionHandler', function () {
             if ($i % 2 === 0) {
                 $operations["task_$i"] = function () use ($i) {
                     await(Timer::delay(0.01));
+
                     throw new RuntimeException("Even task error $i");
                 };
             } else {
                 $operations["task_$i"] = function () use ($i) {
                     await(Timer::delay(0.01));
+
                     return "odd_result_$i";
                 };
             }
@@ -163,11 +170,13 @@ describe('ConcurrentExecutionHandler', function () {
             if ($i === 2) {
                 $operations["batch_task_$i"] = function () use ($i) {
                     await(Timer::delay(0.01));
+
                     throw new Exception("Batch failure $i");
                 };
             } else {
                 $operations["batch_task_$i"] = function () use ($i) {
                     await(Timer::delay(0.01));
+
                     return "batch_success_$i";
                 };
             }

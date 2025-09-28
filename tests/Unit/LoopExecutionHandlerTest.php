@@ -14,6 +14,7 @@ describe('LoopExecutionHandler', function () {
     it('runs callable operations and manages event loop', function () {
         $result = $this->handler->run(function () {
             await(Timer::delay(0.01));
+
             return 'test_result';
         });
 
@@ -21,10 +22,10 @@ describe('LoopExecutionHandler', function () {
     });
 
     it('runs promise operations directly', function () {
-        $promise = Timer::delay(0.01)->then(fn() => 'promise_result');
-        
+        $promise = Timer::delay(0.01)->then(fn () => 'promise_result');
+
         $result = $this->handler->run($promise);
-        
+
         expect($result)->toBe('promise_result');
     });
 
@@ -32,15 +33,16 @@ describe('LoopExecutionHandler', function () {
         // Test callable
         $callablePromise = $this->handler->createPromiseFromOperation(function () {
             await(Timer::delay(0.01));
+
             return 'callable_result';
         });
-        
-        expect($callablePromise)->toBeInstanceOf(\Hibla\Promise\Interfaces\PromiseInterface::class);
-        
+
+        expect($callablePromise)->toBeInstanceOf(Hibla\Promise\Interfaces\PromiseInterface::class);
+
         // Test existing promise
-        $existingPromise = Timer::delay(0.01)->then(fn() => 'existing_result');
+        $existingPromise = Timer::delay(0.01)->then(fn () => 'existing_result');
         $wrappedPromise = $this->handler->createPromiseFromOperation($existingPromise);
-        
+
         expect($wrappedPromise)->toBe($existingPromise);
     });
 
@@ -48,6 +50,7 @@ describe('LoopExecutionHandler', function () {
         expect(function () {
             $this->handler->run(function () {
                 await(Timer::delay(0.01));
+
                 throw new RuntimeException('test_exception');
             });
         })->toThrow(RuntimeException::class, 'test_exception');
@@ -57,7 +60,7 @@ describe('LoopExecutionHandler', function () {
         $promise = Timer::delay(0.01)->then(function () {
             throw new Exception('promise_rejection');
         });
-        
+
         expect(function () use ($promise) {
             $this->handler->run($promise);
         })->toThrow(Exception::class, 'promise_rejection');

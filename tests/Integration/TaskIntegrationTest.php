@@ -1,8 +1,10 @@
 <?php
 
 use Hibla\Async\Timer;
-use Hibla\Task\Task;
+
 use function Hibla\Promise\concurrentSettled;
+
+use Hibla\Task\Task;
 
 beforeEach(function () {
     resetEventLoop();
@@ -15,17 +17,20 @@ describe('Task Integration Tests', function () {
             $step1Results = await(all([
                 'fetch_user' => async(function () {
                     await(Timer::delay(0.02));
+
                     return ['id' => 1, 'name' => 'John'];
                 }),
                 'fetch_posts' => async(function () {
                     await(Timer::delay(0.03));
+
                     return [
                         ['id' => 1, 'title' => 'Post 1'],
-                        ['id' => 2, 'title' => 'Post 2']
+                        ['id' => 2, 'title' => 'Post 2'],
                     ];
                 }),
                 'fetch_settings' => async(function () {
                     await(Timer::delay(0.01));
+
                     return ['theme' => 'dark', 'lang' => 'en'];
                 }),
             ]));
@@ -34,6 +39,7 @@ describe('Task Integration Tests', function () {
             foreach ($step1Results['fetch_posts'] as $post) {
                 $operations["process_post_{$post['id']}"] = async(function () use ($post) {
                     await(Timer::delay(0.015));
+
                     return array_merge($post, ['processed' => true]);
                 });
             }
@@ -44,7 +50,7 @@ describe('Task Integration Tests', function () {
             return [
                 'user' => $step1Results['fetch_user'],
                 'settings' => $step1Results['fetch_settings'],
-                'posts' => array_values($step2Results)
+                'posts' => array_values($step2Results),
             ];
         });
 
@@ -59,16 +65,19 @@ describe('Task Integration Tests', function () {
         $operations = [
             'reliable_service' => function () {
                 await(Timer::delay(0.01));
+
                 return 'success';
             },
             'failing_service' => function () {
                 await(Timer::delay(0.02));
+
                 throw new RuntimeException('Service unavailable');
             },
             'slow_service' => function () {
                 await(Timer::delay(0.05));
+
                 return 'slow_success';
-            }
+            },
         ];
 
         $results = Task::runAllSettled($operations);
@@ -99,6 +108,7 @@ describe('Task Integration Tests', function () {
         for ($i = 0; $i < $operationCount; $i++) {
             $operations["op_$i"] = function () use ($i) {
                 await(Timer::delay(0.01));
+
                 return $i * 2;
             };
         }
@@ -124,11 +134,11 @@ describe('Task Integration Tests', function () {
     it('preserves key order in various scenarios', function () {
         // Test with mixed key types and different completion times
         $operations = [
-            'z_last' =>  Timer::delay(0.001)->then(fn() => 'z'),
-            'a_first' => Timer::delay(0.003)->then(fn() => 'a'),
-            99 => Timer::delay(0.002)->then(fn() => 99),
-            'middle' => Timer::delay(0.004)->then(fn() => 'm'),
-            1 => Timer::delay(0.001)->then(fn() => 1)
+            'z_last' => Timer::delay(0.001)->then(fn () => 'z'),
+            'a_first' => Timer::delay(0.003)->then(fn () => 'a'),
+            99 => Timer::delay(0.002)->then(fn () => 99),
+            'middle' => Timer::delay(0.004)->then(fn () => 'm'),
+            1 => Timer::delay(0.001)->then(fn () => 1),
         ];
 
         $results = Task::runAll($operations);
@@ -146,24 +156,29 @@ describe('Task Integration Tests', function () {
         $complexOperations = [
             'database_query' => function () {
                 await(Timer::delay(0.02));
+
                 return ['users' => [1, 2, 3]];
             },
             'api_call_1' => function () {
                 await(Timer::delay(0.03));
+
                 throw new Exception('API timeout');
             },
             'file_operation' => function () {
                 await(Timer::delay(0.01));
+
                 return 'file_content';
             },
             'api_call_2' => function () {
                 await(Timer::delay(0.025));
+
                 return ['status' => 'ok', 'data' => 'response'];
             },
             'failing_validation' => function () {
                 await(Timer::delay(0.015));
+
                 throw new RuntimeException('Validation failed');
-            }
+            },
         ];
 
         $results = Task::runConcurrentSettled($complexOperations, 3);
@@ -174,7 +189,7 @@ describe('Task Integration Tests', function () {
             'api_call_1',
             'file_operation',
             'api_call_2',
-            'failing_validation'
+            'failing_validation',
         ]);
 
         // Test successful operations
@@ -206,11 +221,13 @@ describe('Task Integration Tests', function () {
                 // Every 4th operation fails
                 $batchOperations["batch_op_$i"] = function () use ($i) {
                     await(Timer::delay(0.01));
+
                     throw new Exception("Batch operation $i failed");
                 };
             } else {
                 $batchOperations["batch_op_$i"] = function () use ($i) {
                     await(Timer::delay(0.01));
+
                     return "batch_result_$i";
                 };
             }
@@ -260,12 +277,14 @@ describe('Task Integration Tests', function () {
             $level1Results = await(allSettled([
                 'step1' => async(function () {
                     await(Timer::delay(0.01));
+
                     return 'step1_complete';
                 }),
                 'step2' => async(function () {
                     await(Timer::delay(0.015));
+
                     throw new Exception('step2_failed');
-                })
+                }),
             ]));
 
             $finalResult = ['level1' => $level1Results];
@@ -275,6 +294,7 @@ describe('Task Integration Tests', function () {
                 $level2Results = await(concurrentSettled([
                     'process_success' => async(function () use ($level1Results) {
                         await(Timer::delay(0.01));
+
                         return 'processed_' . $level1Results['step1']['value'];
                     }),
                     'handle_failure' => async(function () use ($level1Results) {
@@ -282,14 +302,15 @@ describe('Task Integration Tests', function () {
                         if ($level1Results['step2']['status'] === 'rejected') {
                             return 'handled_failure';
                         }
+
                         return 'no_failure_to_handle';
-                    })
+                    }),
                 ], 2));
 
                 $finalResult['level2'] = $level2Results;
             } else {
                 $finalResult['level2'] = [
-                    'process_success' => ['status' => 'rejected', 'reason' => 'No success to process']
+                    'process_success' => ['status' => 'rejected', 'reason' => 'No success to process'],
                 ];
             }
 
@@ -317,10 +338,11 @@ describe('Task Integration Tests', function () {
 
         for ($i = 0; $i < $operationCount; $i++) {
             if ($i === 10) {
-                $operations["op_$i"] = fn() => throw new Exception("Operation $i failed");
+                $operations["op_$i"] = fn () => throw new Exception("Operation $i failed");
             } else {
                 $operations["op_$i"] = function () use ($i) {
                     Hibla\sleep(0.01);
+
                     return "result_$i";
                 };
             }
@@ -361,10 +383,11 @@ describe('Task Integration Tests', function () {
         expect($failureCount)->toBe(1);
 
         $timeDifference = $settledTime - $concurrentTime;
-        $toleranceThreshold = $settledTime * 0.3; 
+        $toleranceThreshold = $settledTime * 0.3;
 
         expect($timeDifference)->toBeGreaterThan(-$toleranceThreshold)
-            ->and($concurrentTime)->toBeLessThan($settledTime + $toleranceThreshold);
+            ->and($concurrentTime)->toBeLessThan($settledTime + $toleranceThreshold)
+        ;
 
         $expectedMinTime = 0.004;
         expect($settledTime)->toBeGreaterThan($expectedMinTime);

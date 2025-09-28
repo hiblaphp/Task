@@ -1,8 +1,8 @@
 <?php
 
-use Hibla\Task\Task;
-use Hibla\Promise\Promise;
 use Hibla\Async\Exceptions\TimeoutException;
+use Hibla\Promise\Promise;
+use Hibla\Task\Task;
 
 beforeEach(function () {
     resetEventLoop();
@@ -11,7 +11,7 @@ beforeEach(function () {
 describe('Task API Error Handling', function () {
 
     it('propagates exceptions from run() with callable', function () {
-        expect(fn() => Task::run(function () {
+        expect(fn () => Task::run(function () {
             throw new RuntimeException('Test error from callable');
         }))->toThrow(RuntimeException::class, 'Test error from callable');
     });
@@ -21,31 +21,33 @@ describe('Task API Error Handling', function () {
             $reject(new InvalidArgumentException('Promise rejection error'));
         });
 
-        expect(fn() => Task::run($promise))
-            ->toThrow(InvalidArgumentException::class, 'Promise rejection error');
+        expect(fn () => Task::run($promise))
+            ->toThrow(InvalidArgumentException::class, 'Promise rejection error')
+        ;
     });
 
     it('propagates exceptions from runStateful()', function () {
-        expect(fn() => Task::runStateful(function () {
+        expect(fn () => Task::runStateful(function () {
             throw new LogicException('Stateful run error');
         }))->toThrow(LogicException::class, 'Stateful run error');
     });
 
     it('handles errors in runAll() and fails fast', function () {
         $operations = [
-            'success1' => fn() => 'result1',
-            'error' => fn() => throw new Exception('Operation failed'),
-            'success2' => fn() => 'result2', // This might not execute due to fail-fast
+            'success1' => fn () => 'result1',
+            'error' => fn () => throw new Exception('Operation failed'),
+            'success2' => fn () => 'result2', // This might not execute due to fail-fast
         ];
 
-        expect(fn() => Task::runAll($operations))
-            ->toThrow(Exception::class, 'Operation failed');
+        expect(fn () => Task::runAll($operations))
+            ->toThrow(Exception::class, 'Operation failed')
+        ;
     });
 
     it('handles mixed success and failure in runAllSettled()', function () {
         $operations = [
-            'success' => fn() => 'successful result',
-            'error' => fn() => throw new RuntimeException('Failed operation'),
+            'success' => fn () => 'successful result',
+            'error' => fn () => throw new RuntimeException('Failed operation'),
             'promise_success' => Promise::resolved('promise result'),
             'promise_error' => Promise::rejected(new InvalidArgumentException('Promise failed')),
         ];
@@ -56,7 +58,7 @@ describe('Task API Error Handling', function () {
 
         expect($results['success'])->toBe([
             'status' => 'fulfilled',
-            'value' => 'successful result'
+            'value' => 'successful result',
         ]);
 
         expect($results['error']['status'])->toBe('rejected');
@@ -65,7 +67,7 @@ describe('Task API Error Handling', function () {
 
         expect($results['promise_success'])->toBe([
             'status' => 'fulfilled',
-            'value' => 'promise result'
+            'value' => 'promise result',
         ]);
 
         expect($results['promise_error']['status'])->toBe('rejected');
@@ -75,20 +77,21 @@ describe('Task API Error Handling', function () {
 
     it('handles errors in runConcurrent() with fail-fast behavior', function () {
         $operations = [
-            fn() => 'success1',
-            fn() => throw new Exception('Concurrent error'),
-            fn() => 'success2',
+            fn () => 'success1',
+            fn () => throw new Exception('Concurrent error'),
+            fn () => 'success2',
         ];
 
-        expect(fn() => Task::runConcurrent($operations, 2))
-            ->toThrow(Exception::class, 'Concurrent error');
+        expect(fn () => Task::runConcurrent($operations, 2))
+            ->toThrow(Exception::class, 'Concurrent error')
+        ;
     });
 
     it('handles mixed results in runConcurrentSettled()', function () {
         $operations = [
-            'op1' => fn() => 'success',
-            'op2' => fn() => throw new RuntimeException('Failure'),
-            'op3' => fn() => 'another success',
+            'op1' => fn () => 'success',
+            'op2' => fn () => throw new RuntimeException('Failure'),
+            'op3' => fn () => 'another success',
         ];
 
         $results = Task::runConcurrentSettled($operations, 2);
@@ -104,26 +107,28 @@ describe('Task API Error Handling', function () {
             // This promise intentionally never resolves to test timeout
         });
 
-        expect(fn() => Task::runWithTimeout($slowPromise, 0.1))
-            ->toThrow(TimeoutException::class);
+        expect(fn () => Task::runWithTimeout($slowPromise, 0.1))
+            ->toThrow(TimeoutException::class)
+        ;
     });
 
     it('handles errors in runBatch()', function () {
         $operations = [
-            fn() => 'batch1',
-            fn() => throw new Exception('Batch error'),
-            fn() => 'batch2',
+            fn () => 'batch1',
+            fn () => throw new Exception('Batch error'),
+            fn () => 'batch2',
         ];
 
-        expect(fn() => Task::runBatch($operations, 2))
-            ->toThrow(Exception::class, 'Batch error');
+        expect(fn () => Task::runBatch($operations, 2))
+            ->toThrow(Exception::class, 'Batch error')
+        ;
     });
 
     it('handles mixed results in runBatchSettled()', function () {
         $operations = [
-            'batch1' => fn() => 'success1',
-            'batch2' => fn() => throw new RuntimeException('Batch failure'),
-            'batch3' => fn() => 'success2',
+            'batch1' => fn () => 'success1',
+            'batch2' => fn () => throw new RuntimeException('Batch failure'),
+            'batch3' => fn () => 'success2',
         ];
 
         $results = Task::runBatchSettled($operations, 2);
@@ -135,7 +140,7 @@ describe('Task API Error Handling', function () {
     });
 
     it('preserves exception types and messages through the chain', function () {
-        $customException = new class('Custom error message') extends Exception {
+        $customException = new class ('Custom error message') extends Exception {
             public function getCustomData(): string
             {
                 return 'custom data';
@@ -178,10 +183,10 @@ describe('Task API Error Handling', function () {
             'nested_attempt' => function () {
                 // This should fail with "Cannot call run() while already running"
                 return Task::runAllSettled([
-                    'inner' => fn() => 'inner result',
+                    'inner' => fn () => 'inner result',
                 ]);
             },
-            'normal_operation' => fn() => 'normal result',
+            'normal_operation' => fn () => 'normal result',
         ];
 
         $results = Task::runAllSettled($operations);
@@ -191,7 +196,8 @@ describe('Task API Error Handling', function () {
         expect($results['nested_attempt']['status'])->toBe('rejected');
         expect($results['nested_attempt']['reason'])->toBeInstanceOf(RuntimeException::class);
         expect($results['nested_attempt']['reason']->getMessage())
-            ->toBe('Cannot call run() while already running. Use await() instead.');
+            ->toBe('Cannot call run() while already running. Use await() instead.')
+        ;
 
         expect($results['normal_operation']['status'])->toBe('fulfilled');
         expect($results['normal_operation']['value'])->toBe('normal result');
@@ -205,7 +211,7 @@ describe('Task API Error Handling', function () {
                     'nested_data' => ['key' => 'value'],
                 ]);
             }),
-            'simple_operation' => fn() => 'simple result',
+            'simple_operation' => fn () => 'simple result',
         ];
 
         $results = Task::runAllSettled($operations);
@@ -221,7 +227,7 @@ describe('Task API Error Handling', function () {
 
     it('ensures proper cleanup after errors', function () {
         // Run an operation that fails
-        expect(fn() => Task::run(function () {
+        expect(fn () => Task::run(function () {
             throw new Exception('Cleanup test error');
         }))->toThrow(Exception::class);
 

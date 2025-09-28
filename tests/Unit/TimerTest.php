@@ -1,7 +1,6 @@
 <?php
 
 use Hibla\Async\Timer;
-use Hibla\Promise\Interfaces\CancellablePromiseInterface;
 
 beforeEach(function () {
     resetEventLoop();

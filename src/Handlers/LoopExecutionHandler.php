@@ -67,34 +67,34 @@ final class LoopExecutionHandler
         }
     }
 
-/**
- * @param  callable|PromiseInterface<mixed>  $operation
- * @return PromiseInterface<mixed>
- */
-public function createPromiseFromOperation(callable|PromiseInterface $operation): PromiseInterface
-{
-    if (is_callable($operation)) {
-        return new Promise(function (callable $resolve, callable $reject) use ($operation) {
-            try {
-                $asyncTask = $this->asyncOps->async($operation);
-                $result = $asyncTask();
-                
-                // If the callable returns a PromiseInterface, await it
-                if ($result instanceof PromiseInterface) {
-                    $awaitedResult = await($result);
-                    $resolve($awaitedResult);
-                } else {
-                    // If it's not a promise, resolve with the direct result
-                    $resolve($result);
+    /**
+     * @param  callable|PromiseInterface<mixed>  $operation
+     * @return PromiseInterface<mixed>
+     */
+    public function createPromiseFromOperation(callable|PromiseInterface $operation): PromiseInterface
+    {
+        if (is_callable($operation)) {
+            return new Promise(function (callable $resolve, callable $reject) use ($operation) {
+                try {
+                    $asyncTask = $this->asyncOps->async($operation);
+                    $result = $asyncTask();
+
+                    // If the callable returns a PromiseInterface, await it
+                    if ($result instanceof PromiseInterface) {
+                        $awaitedResult = await($result);
+                        $resolve($awaitedResult);
+                    } else {
+                        // If it's not a promise, resolve with the direct result
+                        $resolve($result);
+                    }
+                } catch (Throwable $e) {
+                    $reject($e);
                 }
-            } catch (Throwable $e) {
-                $reject($e);
-            }
-        });
+            });
+        }
+
+        return $operation;
     }
-    
-    return $operation;
-}
 
     /**
      * Safely convert mixed value to string for error messages
