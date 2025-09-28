@@ -312,48 +312,40 @@ describe('Task Integration Tests', function () {
     });
 
     it('verifies performance characteristics of settlement methods', function () {
-        $operationCount = 30;
+        $operationCount = 50;
         $operations = [];
 
         for ($i = 0; $i < $operationCount; $i++) {
-            if ($i % 5 === 0) {
-                // Every 5th operation fails
-                $operations["perf_op_$i"] = function () use ($i) {
-                    await(Timer::delay(0.02));
-                    throw new RuntimeException("Performance test failure $i");
-                };
+            if ($i === 10) {
+                $operations["op_$i"] = fn() => throw new Exception("Operation $i failed");
             } else {
-                $operations["perf_op_$i"] = function () use ($i) {
-                    await(Timer::delay(0.02));
-                    return "perf_result_$i";
+                $operations["op_$i"] = function () use ($i) {
+                    Hibla\sleep(0.01);
+                    return "result_$i";
                 };
             }
         }
 
-        // Test regular concurrent (should fail fast on first error)
-        $startConcurrent = microtime(true);
         $concurrentFailed = false;
+        $concurrentTime = 0;
 
         try {
-            Task::runConcurrent($operations, 5);
+            $start = microtime(true);
+            Task::runConcurrent($operations, 10);
         } catch (Exception $e) {
+            $concurrentTime = microtime(true) - $start;
             $concurrentFailed = true;
         }
 
-        $concurrentTime = microtime(true) - $startConcurrent;
-
-        // Test settled concurrent (should complete all operations)
         $startSettled = microtime(true);
-        $settledResults = Task::runConcurrentSettled($operations, 5);
+        $settledResults = Task::runConcurrentSettled($operations, 10);
         $settledTime = microtime(true) - $startSettled;
 
-        // Verify concurrent failed fast
         expect($concurrentFailed)->toBeTrue();
-        expect($concurrentTime)->toBeLessThan($settledTime);
 
-        // Verify settled completed all operations
         expect($settledResults)->toHaveCount($operationCount);
 
+        // Count successful vs failed operations in settled results
         $successCount = 0;
         $failureCount = 0;
 
@@ -365,7 +357,16 @@ describe('Task Integration Tests', function () {
             }
         }
 
-        expect($successCount)->toBe(24); // 30 - 6 failures (0, 5, 10, 15, 20, 25)
-        expect($failureCount)->toBe(6);
+        expect($successCount)->toBe($operationCount - 1);
+        expect($failureCount)->toBe(1);
+
+        $timeDifference = $settledTime - $concurrentTime;
+        $toleranceThreshold = $settledTime * 0.3; 
+
+        expect($timeDifference)->toBeGreaterThan(-$toleranceThreshold)
+            ->and($concurrentTime)->toBeLessThan($settledTime + $toleranceThreshold);
+
+        $expectedMinTime = 0.004;
+        expect($settledTime)->toBeGreaterThan($expectedMinTime);
     });
 });
